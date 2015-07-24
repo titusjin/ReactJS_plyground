@@ -1,3 +1,6 @@
+## Titus.jin use this project to play with reactjs and verify some ideas about it.
+
+
 # [React](http://facebook.github.io/react) [![Build Status](https://travis-ci.org/facebook/react.svg?branch=master)](https://travis-ci.org/facebook/react)
 
 React is a JavaScript library for building user interfaces.
