@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://fb.me/react-0.12.0.js"></script>
+<script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+	<div id="example"></div>
+	<script type="text/jsx">
+    /** @jsx React.DOM */
+	var facebookShowLink = { href: 'facebookShow.html' };
+	
+	var Container = React.createClass({
+		render: function(){
+			console.log(this.props.href);
+			
+			return (
+				<a {...this.props}>Click here {'√'} {this.props.children}</a>
+			);
+		}
+	});
+
+	React.render(
+		<Container {...facebookShowLink}/>,
+		document.getElementById('example')
+	);
+	</script>
+</body>
+</html>

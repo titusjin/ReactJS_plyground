@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- script src="build/react.js"></script>
+    <script src="build/JSXTransformer.js"></script -->
+<script src="http://fb.me/react-0.12.0.js"></script>
+<script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+	<div id="example"></div>
+	<script type="text/jsx">
+    /** @jsx React.DOM */
+	var LikeButton = React.createClass({
+		getInitialState : function(){
+			return {liked: false};
+		},
+		customAfterRender: function(){
+			var stateLiked = this.state.liked ? 'like' : 'haven\'t liked';
+			var textNode = 'hello ' + stateLiked + ' world';			
+
+			if($('#appendMessage').length  !== 0){
+				$('#appendMessage').detach();
+				$("#titusjin").append("<div id='appendMessage'>"+textNode+"</div>");
+			}else{
+				$("#titusjin").append("<div id='appendMessage'>"+textNode+"</div>");
+			}
+		},
+		handleClick: function(event) {
+    		this.setState({liked: !this.state.liked},this.customAfterRender);
+  		},
+		render: function() {
+			var text = this.state.liked ? 'like' : 'haven\'t liked';
+			return (
+				 <p id='titusjin' onClick={this.handleClick}>
+        			You {text} this. Click to toggle.
+      			 </p>
+			);
+		}
+	});
+
+	var CheckLink = React.createClass({
+  		render: function() {
+    		return (
+				<a {...this.props}>Click here {'√'} {this.props.children}</a>
+			);
+  		}
+	});
+	
+	var Container = React.createClass({
+		render: function(){
+			return (
+				<div>
+					<LikeButton />
+					<CheckLink href="helloworld.html" />
+				</div>
+			);
+		}
+	});
+
+	React.render(
+		<Container />,
+		document.getElementById('example')
+	);
+	</script>
+</body>
+</html>

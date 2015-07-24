@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+<script src="http://fb.me/JSXTransformer-0.13.3.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+<div id='banner'></div>
+<div id='example'></div>
+
+<script type="text/jsx">
+/** @jsx React.DOM */
+var gloEMinx = {
+	gloE : {},
+	hookUp : function(event,callBack){
+		$(this.gloE).on(event,callBack);
+	},
+	unhook : function(event){
+		$(this.gloE).off(event);
+	}
+}
+
+var data ={
+			first: ["Apple", "HTC","Samsung"],
+			second: {
+						Apple: ["iPhone5C", "iPhone5S","iPhone6","iPhone6Plus"],
+						HTC : ["Desire820","ButteryFlyS","One_M9","One_E9"],
+						Samsung: ["GalaxyS6","GalaxyS6Edge","GalaxyNote3","GalaxyNote4","GalaxyNoteEdge"]
+		  	}
+}
+
+var Banner = React.createClass({
+	mixins: [gloEMinx],
+	getInitialState : function(){
+		return {content: []};
+	},
+	componentDidMount : function(){
+		this.hookUp('add',function(e,data){
+			var newContent = this.state.content.concat([data]);
+			this.setState({content:newContent});
+		}.bind(this));
+	},
+	render: function(){
+		var data = this.state.content.map(function(node){
+			return <div><span style={{color: 'red'}}>{node}</span></div>
+		});
+		return(
+			<div className="bannerContainer">
+				{data}
+			</div>
+		);
+	},
+	componentWillUnmount: function () {
+		$(gloEMinx.gloE).off('add')
+	}
+});
+
+var SecondaryMenu = React.createClass({
+	getInitialState: function() {
+		return {firstData: this.props.data.first,
+				secondData: this.props.data.second.Apple};
+	},
+	syncData: function(e){
+		e.preventDefault(e);
+		var selected = React.findDOMNode(this.refs.firstSelect).value.trim();
+		this.setState({firstData: this.props.data.first,
+					   secondData: this.props.data.second[selected]});
+	},
+	handleE: function(e){
+		e.preventDefault();
+		var value = React.findDOMNode(this.refs.secondSelect).value.trim();
+
+		$(gloEMinx.gloE).trigger('add',[value]);
+	},
+  	render: function() {
+		var option1 = this.state.firstData.map(function(nodeData){
+			return <option value={nodeData}>{nodeData}</option>
+		});
+		var option2 = this.state.secondData.map(function(nodeData){
+			return <option value={nodeData}>{nodeData}</option>
+		});
+		
+    	return (
+      		<div>
+        		<h2 style={{textAlign: 'center'}}>Company</h2>
+        		<div style={{textAlign:'center'}}>
+					<select ref="firstSelect" onChange={this.syncData}>
+						{option1}
+					</select>
+				</div>
+        		<h2 style={{textAlign: 'center'}}>Product</h2>
+				<div style={{textAlign:'center'}}>
+					<select ref="secondSelect" onChange= {this.handleE}>
+						{option2}
+					</select>
+				</div>
+      		</div>
+    	);
+  	}
+});
+
+React.render(<Banner />,document.getElementById('banner'));
+React.render(<SecondaryMenu data={this.data} />,document.getElementById('example'));
+
+</script>
+</body>
+</html>

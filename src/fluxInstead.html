@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+<script src="http://fb.me/JSXTransformer-0.13.3.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="./amplify.min.js"></script>
+<script src="./bundle.js"></script>
+</head>
+<body>
+<div id="example"></div>
+
+<script type="text/jsx">
+/** @jsx React.DOM */
+AppDispatcher.register( function( payload ) {
+    switch( payload.eventName ) {
+        case 'trigger':
+            fluxInsteadMixin.store.changeSecondMenu(payload.newItem.data);
+            break;
+    }
+}); 
+
+var gloEMinx = {
+	hookUp : function(obj,event,callBack){
+		obj.on(event,callBack);
+	},
+	unhook : function(obj,event){
+		obj.off(event);
+	},
+	actionCreater: {
+		sync: function(selected){
+			amplify.publish('sync',selected);
+		}
+	},
+	registActionHandler : function(event){
+		var context = this;
+		amplify.subscribe(event,function(input){
+				context.store.changeSecondMenu(input.data);
+		}.bind(context));
+	}
+}
+
+var data ={
+			first: ["Apple", "HTC","Samsung"],
+			second: {
+						Apple: ["iPhone5C", "iPhone5S","iPhone6","iPhone6Plus"],
+						HTC : ["Desire820","ButteryFlyS","One_M9","One_E9"],
+						Samsung: ["GalaxyS6","GalaxyS6Edge","GalaxyNote3","GalaxyNote4","GalaxyNoteEdge"]
+		  	}
+}
+
+var fluxInsteadMixin = {
+	store: {
+		model: {firstData: data.first,
+				secondData: data.second.Apple},
+		getData : function(){
+			return this.model;
+		},
+		changeSecondMenu : function(selected){
+			this.model.secondData = data.second[selected];
+		}
+	},
+	dataInitialized: function(){
+		return this.store.getData();
+	}
+} 
+
+
+var SecondaryMenu = React.createClass({
+	mixins: [gloEMinx,fluxInsteadMixin],
+	getInitialState: function() {
+		return this.dataInitialized();
+	},
+    componentDidMount : function(){
+		//this.registActionHandler('sync');
+
+		// use mixin functoin to bind evnet handler of store for view re-rendering
+		this.hookUp($(this.store),'modelChange',function(){
+			this.setState(this.store.getData());
+		}.bind(this));
+	},
+	// User trigger action
+	syncData: function(e){
+		e.preventDefault(e);
+		var selected = React.findDOMNode(this.refs.firstSelect).value.trim();
+
+		AppDispatcher.dispatch({
+        	eventName: 'trigger',
+        	newItem: { data: selected }  // example data
+    	});		
+
+
+		//Like dispatcher, but brocast events by amplify.js
+		//this.actionCreater.sync({data:selected});
+		//amplify.publish('trigger',{data: selected});
+		
+		// after store finish model update, trigger view re-rendering
+		$(this.store).trigger('modelChange');
+	},
+  	render: function() {
+		var option1 = this.state.firstData.map(function(nodeData){
+			return <option value={nodeData}>{nodeData}</option>
+		});
+		var option2 = this.state.secondData.map(function(nodeData){
+			return <option value={nodeData}>{nodeData}</option>
+		});
+    	return (
+      		<div>
+        		<h2 style={{textAlign: 'center'}}>Company</h2>
+        		<div style={{textAlign:'center'}}>
+					<select ref="firstSelect" onChange={this.syncData}>
+						{option1}
+					</select>
+				</div>
+        		<h2 style={{textAlign: 'center'}}>Product</h2>
+				<div style={{textAlign:'center'}}>
+					<select ref="secondSelect">
+						{option2}
+					</select>
+				</div>
+      		</div>
+    	);
+  	},
+	componentWillUnmount: function () {
+		$(this.store).off('modelChange');
+	}
+});
+
+React.render(
+  <SecondaryMenu />,document.getElementById('example')
+);
+</script>
+
+</body>
+</html>

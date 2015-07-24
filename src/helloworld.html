@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- script src="build/react.js"></script>
+    <script src="build/JSXTransformer.js"></script -->
+    <script src="http://fb.me/react-0.12.0.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    
+    <script type="text/jsx">
+    /** @jsx React.DOM */
+	var HelloDate = React.createClass({
+		getInitialState : function(){
+			return {date: new Date()};
+		},
+		makeDateString : function(){
+			this.setState({date: (new Date()).toTimeString()});
+		},
+		componentDidMount : function(){
+			this.interval = setInterval(this.makeDateString,1000);
+		},
+		showAttribute : function(){
+			alert(document.getElementById('pp').getAttribute('data-foo'));
+		},
+		render: function() {
+			return (
+				<p id='pp' className='firstP' data-foo="titus" onClick={this.showAttribute}>
+					Hello, <input type="text" placeholder="Your name here" />!
+					It is {this.state.date}
+					<br /> <span>{'First \u00b7 Second'}</span>
+					{React.createElement('a',{href: 'http://tw.yahoo.com'},'simple testing.')}
+					{React.DOM.div({name:'justKid'},'hello world~~')}
+				</p>
+			);
+		}
+	});
+
+	React.render(
+			<HelloDate name={window.isLoggedIn ? window.name : String.fromCharCode(72, 69, 76, 76, 79)} />,
+			document.getElementById('example')
+	);
+	</script>
+  </body>
+</html>

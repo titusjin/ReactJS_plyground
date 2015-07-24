@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+<script src="http://fb.me/JSXTransformer-0.13.3.js"></script>
+</head>
+<body>
+<div id="example"></div>
+
+<script type="text/jsx">
+/** @jsx React.DOM */
+var data ={
+			first: ["Apple", "HTC","Samsung"],
+			second: {
+						Apple: ["iPhone5C", "iPhone5S","iPhone6","iPhone6Plus"],
+						HTC : ["Desire820","ButteryFlyS","One_M9","One_E9"],
+						Samsung: ["GalaxyS6","GalaxyS6Edge","GalaxyNote3","GalaxyNote4","GalaxyNoteEdge"]
+		  	}
+}
+
+var SecondaryMenu = React.createClass({
+	getInitialState: function() {
+		return {firstData: this.props.data.first,
+				secondData: this.props.data.second.Apple};
+	},
+	syncData: function(selected){
+		console.log(this.props.data.second.HTC);
+		this.setState({firstData: this.props.data.first,
+					   secondData: this.props.data.second[selected]});
+	},
+  	render: function() {
+    	return (
+      		<div>
+        		<h2 style={{textAlign: 'center'}}>Company</h2>
+        		<FirstMenu data={this.state.firstData} onChangeCallBack={this.syncData} />
+        		<h2 style={{textAlign: 'center'}}>Product</h2>
+				<SecondMenu data={this.state.secondData} />
+      		</div>
+    	);
+  	}
+});
+
+var FirstMenu = React.createClass({
+	handleSelectChange : function(e){
+		e.preventDefault();
+		this.props.onChangeCallBack(React.findDOMNode(this.refs.firstSelect).value.trim());
+	},
+  	render: function() {
+		var option = this.props.data.map(function(nodeData){
+							return <option value={nodeData}>{nodeData}</option>
+		});
+    	return (
+			<div style={{textAlign:'center'}}>
+				<select ref="firstSelect" onChange={this.handleSelectChange}>
+					{option}
+				</select>
+			</div>
+    	);
+  	}
+});
+
+var SecondMenu = React.createClass({
+	render: function(){
+		var option = this.props.data.map(function(nodeData){
+			return <option value={nodeData}>{nodeData}</option>
+		});
+		return (
+			<div style={{textAlign:'center'}}>
+				<select ref="secondSelect">
+					{option}
+				</select>
+			</div>
+    	);
+	}
+});
+
+React.render(
+  <SecondaryMenu data={this.data} />,
+  document.getElementById('example')
+);
+
+</script>
+</body>
+</html>

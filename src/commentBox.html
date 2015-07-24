@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://fb.me/react-0.13.1.js"></script>
+<script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+</head>
+<body>
+<div id="example"></div>
+
+<script type="text/jsx">
+/** @jsx React.DOM */
+var initialData = [
+	{familyName: "Pete Hunt", cellphone: "0922333555"},
+	{familyName: "Jordan Walke", cellphone: "0988555666"}
+];
+var fetchURL = "http://esb.cloud.s104.com.tw/services/account/c/209595";
+
+var CommentBox = React.createClass({
+  getInitialState: function() {
+    console.log('in getINitialSatate method');
+    return {data: this.props.data};
+  },
+  loadInitialData : function(){
+	$.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'GET',
+	  cache: false,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  componentDidMount : function(){
+      console.log('IN componentDidMount method...');
+	  this.loadInitialData();
+  },
+  handleCommentSubmit: function(comment) {
+    // TODO: submit to the server and refresh the list
+    var comments = this.state.data;
+    
+    var newComments = comments.concat([comment]);
+    this.setState({data: newComments});
+    console.log('IN handle...');
+    console.log(this.render());
+  },
+  handleCancelSubmit : function(){
+      this.state.data.pop();
+      this.setState({data : this.state.data});
+  },
+  render: function() {
+    console.log('IN render method...');
+    return (
+      <div className="commentBox">
+        <h1>Comments</h1>
+        <CommentList data={this.state.data} />
+        <CommentForm onCommentSubmit={this.handleCommentSubmit}/>
+        <CancelForm onCancelSubmit={this.handleCancelSubmit}/>
+      </div>
+    );
+  }
+});
+
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function (comment) {
+      return (
+        <Comment author={comment.familyName}>
+          {comment.cellphone}
+        </Comment>
+      );
+    });
+    return (
+      <div className="commentList">
+          {commentNodes}
+      </div>
+    );
+  }
+});
+
+var CancelForm = React.createClass({
+    handleCancelSubmit : function(e){
+         console.log('in handlecancel ');
+         e.preventDefault();
+         this.props.onCancelSubmit();
+    },
+    render:function(){
+        return (
+          <form className="commentForm" onSubmit={this.handleCancelSubmit}>
+            <input type="submit" value="remove last comment" />
+          </form>   
+        );
+    }
+});
+
+
+var CommentForm = React.createClass({
+  handleSubmit : function(e){
+	   console.log('CommentForm handleSubmit method start');
+       e.preventDefault();
+       
+       var author = this.refs.author.getDOMNode().value.trim();
+	   var text = this.refs.text.getDOMNode().value.trim();
+	   // this can also be make by var author = React.findDOMNode(this.refs.author).value.trim();
+	   // cause getDOMNode is deprecated. since version 0.13
+	  
+       if(!author && !text){
+          return;
+	   }
+
+              
+       this.props.onCommentSubmit({author: author, text: text});
+       
+	   React.findDOMNode(this.refs.author).value='';
+	   React.findDOMNode(this.refs.text).value='';
+  },
+  render: function() {
+    return (
+      <form className="commentForm" onSubmit={this.handleSubmit}>
+        <input type="text" placeholder="Your name" ref="author" /><br />
+        <input type="text" placeholder="Say something..." ref="text" />
+        <input type="submit" value="Post" />
+      </form>   
+    );
+  }
+});
+
+
+var Comment = React.createClass({
+  render: function() {
+    var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
+    return (
+      <div className="comment">
+        <h2 className="commentAuthor">
+          {this.props.author}
+        </h2>
+        <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
+      </div>
+    );
+  }
+});
+
+React.render(
+  <CommentBox data={this.initialData} url={this.fetchURL} />,
+  document.getElementById('example')
+);
+</script>
+</body>
+</html>

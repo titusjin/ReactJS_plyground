@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+		<script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+		<script src="http://fb.me/JSXTransformer-0.13.3.js"></script>
+		<style>
+			.titus-enter {
+  				opacity: 0.01;
+  				transition: opacity .5s ease-in;
+			}
+
+			.titus-enter.titus-enter-active {
+  				opacity: 1;
+			}
+			
+			.titus-leave {
+  				opacity: 1;
+  				transition: opacity .5s ease-in;
+			}
+
+			.titus-leave.titus-leave-active {
+  				opacity: 0.01;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="example"></div>
+		
+		<script type="text/jsx">
+			/** @jsx React.DOM */
+
+			var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+			var TodoList = React.createClass({
+  				getInitialState: function() {
+    				return {items: ['hello', 'world', 'click', 'me']};
+  				},
+  				handleAdd: function() {
+    				var newItems = this.state.items.concat([window.prompt('Enter some text')]);
+    				this.setState({items: newItems});
+  				},
+  				handleRemove: function(i) {
+    				var newItems = this.state.items;
+    				newItems.splice(i, 1);
+    				this.setState({items: newItems});
+  				},
+  				render: function() {
+    				var items = this.state.items.map(function(item, i) {
+      					return (
+        					<div key={item} onClick={this.handleRemove.bind(this, i)}>
+          						{item}
+        					</div>
+      					);
+    				}.bind(this));
+    				return (
+      					<div>
+        					<button onClick={this.handleAdd}>Add Item</button>
+       						<ReactCSSTransitionGroup transitionName="titus">
+          						{items}
+        					</ReactCSSTransitionGroup>
+      					</div>
+    				);
+  				}
+			});
+
+			React.render(<TodoList />,document.getElementById('example'));
+		</script>
+	</body>
+</html>

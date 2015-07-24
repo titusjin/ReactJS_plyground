@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- script src="build/react.js"></script>
+    <script src="build/JSXTransformer.js"></script -->
+<script src="http://fb.me/react-0.12.0.js"></script>
+<script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+	<div id="example"></div>
+	<button id="removeBtn">RemoveComponent</button>
+	<script type="text/jsx">
+    /** @jsx React.DOM */
+	$("#removeBtn").on('click',function(e){
+		React.unmountComponentAtNode(document.getElementById('example'));
+	});
+
+	var InputText = React.createClass({
+		getInitialState: function() {
+		    return {value: 'Hello!'};
+  		},
+		componentWillReceiveProps : function(nextProps){
+			console.log(nextProps);
+			this.setState({value: e.target.value});
+		},
+		componentWillUnmount : function(){
+			console.log('will unmouont +++++');
+		}, 
+		handleChange : function(e){
+			//console.log(e);
+			console.log(e.target.value);
+			this.props.content = e.target.value;
+
+			this.setState({value: e.target.value});
+			this.forceRender();
+		},
+		handleReset: function(e){
+			this.ref.text.getDOMNode().value='';
+		},
+		render: function(){
+			return 	(
+				<form>
+					<input id='firstInput' type="text" onChange={this.handleChange} ref='text' />
+					<button id='resetBtn' onClick={this.handleReset}>Reset</button>
+				</form>
+			);
+		}
+	});
+
+	React.render(
+		<InputText content="hello" />,
+		document.getElementById('example')
+	);
+	</script>
+</body>
+</html>
